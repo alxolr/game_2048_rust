@@ -26,12 +26,13 @@ fn main() {
         // If a key was pressed
         if let Some(Ok(key)) = input {
             match key {
-                // Exit if 'q' is pressed
                 Key::Char('q') => break,
+
                 Key::Up => game.compute(Action::Up),
                 Key::Down => game.compute(Action::Down),
                 Key::Left => game.compute(Action::Left),
                 Key::Right => game.compute(Action::Right),
+
                 _ => {
                     write!(
                         stdout,

@@ -48,28 +48,32 @@ impl Game {
         };
     }
 
-    fn is_empty(&self, i: usize, j: usize) -> bool {
+    fn is_cell_empty(&self, i: usize, j: usize) -> bool {
         self.board[i][j] == 0
     }
 
     fn compute_up(&mut self) {
         for j in 0..self.size {
             for i in 0..self.size {
-                let mut l = i;
-                if !self.is_empty(i, j) {
+                if !self.is_cell_empty(i, j) {
+                    let mut l = i;
                     let val = self.board[i][j];
-                    if l > 0 && self.is_empty(l - 1, j) {
-                        self.board[i][j] = 0;
-                        loop {
+                    loop {
+                        if l > 0 {
                             l -= 1;
-                            if self.is_empty(l, j) {
+                            if self.is_cell_empty(l, j) {
                                 self.board[l][j] = val;
                                 self.board[l + 1][j] = 0;
+                            } else {
+                                if self.board[l][j] == val {
+                                    self.board[l][j] = 2 * val;
+                                    self.score += 2 * val as u32;
+                                    self.board[l + 1][j] = 0;
+                                }
                             }
-
-                            if l == 0 || !self.is_empty(l - 1, j) {
-                                break;
-                            }
+                        }
+                        if l == 0 {
+                            break;
                         }
                     }
                 }
@@ -103,9 +107,9 @@ mod tests {
         let mut game = Game {
             board: vec![
                 vec![2, 0, 0, 0],
-                vec![0, 0, 0, 2],
-                vec![0, 0, 2, 0],
                 vec![0, 2, 0, 0],
+                vec![0, 0, 2, 0],
+                vec![0, 0, 0, 2],
             ],
             size: 4,
             score: 0,
@@ -121,5 +125,30 @@ mod tests {
         game.compute(Action::Up);
         assert_eq!(game.board, expected_state);
         assert_eq!(game.score, 0);
+    }
+
+    #[test]
+    fn when_run_up_and_there_is_a_double_it_should_be_summed_and_moved_up() {
+        let mut game = Game {
+            board: vec![
+                vec![2, 0, 0, 0],
+                vec![2, 0, 2, 2],
+                vec![2, 0, 2, 2],
+                vec![2, 2, 2, 0],
+            ],
+            size: 4,
+            score: 0,
+        };
+
+        let expected_state = vec![
+            vec![4, 2, 4, 4],
+            vec![4, 0, 2, 0],
+            vec![0, 0, 0, 0],
+            vec![0, 0, 0, 0],
+        ];
+
+        game.compute(Action::Up);
+        assert_eq!(game.board, expected_state);
+        assert_eq!(game.score, 16);
     }
 }
