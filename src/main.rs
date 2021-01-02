@@ -10,7 +10,7 @@ use termion::raw::IntoRawMode;
 use termion::{self, event::Key};
 
 fn main() {
-    let mut game = Game::new();
+    let mut game = Game::new(4);
     println!("{}", game);
 
     // Set terminal to raw mode to allow reading stdin one key at a time
@@ -43,6 +43,7 @@ fn main() {
                     .unwrap();
                 }
             }
+            game.generate_new_cell();
             write!(
                 stdout,
                 "{}{}{}",
