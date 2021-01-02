@@ -3,6 +3,9 @@ use std::fmt;
 
 pub enum Action {
     Up,
+    Down,
+    Left,
+    Right,
 }
 
 #[derive(Debug)]
@@ -41,6 +44,7 @@ impl Game {
     pub fn compute(&mut self, action: Action) {
         match action {
             Action::Up => self.compute_up(),
+            _ => unimplemented!(),
         };
     }
 
@@ -77,12 +81,14 @@ impl Game {
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut result = String::new();
+        result = format!("Score: {}\r\n\n", self.score);
+
         for i in 0..self.size {
             let mut line = String::new();
             for j in 0..self.size {
                 line.push_str(&format!("{} ", self.board[i][j]));
             }
-            result.push_str(&format!("{}\n", line));
+            result.push_str(&format!("{}\r\n", line));
         }
 
         write!(f, "{}", result)
