@@ -57,19 +57,33 @@ impl Game {
 
     pub fn generate_new_cell(&mut self) {
         let mut rng = thread_rng();
-        loop {
-            let i = rng.gen_range(0..self.size) as usize;
-            let j = rng.gen_range(0..self.size) as usize;
+        if !self.is_board_full() {
+            loop {
+                let i = rng.gen_range(0..self.size) as usize;
+                let j = rng.gen_range(0..self.size) as usize;
 
-            if self.is_cell_empty(i, j) {
-                if rng.gen_bool(0.25) {
-                    self.board[i][j] = 4;
-                } else {
-                    self.board[i][j] = 2;
+                if self.is_cell_empty(i, j) {
+                    if rng.gen_bool(0.25) {
+                        self.board[i][j] = 4;
+                    } else {
+                        self.board[i][j] = 2;
+                    }
+                    break;
                 }
-                break;
             }
         }
+    }
+
+    pub fn is_board_full(&self) -> bool {
+        for i in 0..self.size {
+            for j in 0..self.size {
+                if self.is_cell_empty(i, j) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     fn is_cell_empty(&self, i: usize, j: usize) -> bool {
@@ -80,23 +94,23 @@ impl Game {
         for i in 0..self.size {
             for j in (0..self.size).rev() {
                 if !self.is_cell_empty(i, j) {
-                    let mut l = j;
+                    let mut pivot = j;
                     let val = self.board[i][j];
                     loop {
-                        if l < self.size - 1 {
-                            l += 1;
-                            if self.is_cell_empty(i, l) {
-                                self.board[i][l] = val;
-                                self.board[i][l - 1] = 0;
+                        if pivot < self.size - 1 {
+                            pivot += 1;
+                            if self.is_cell_empty(i, pivot) {
+                                self.board[i][pivot] = val;
+                                self.board[i][pivot - 1] = 0;
                             } else {
-                                if self.board[i][l] == val {
-                                    self.board[i][l] = 2 * val;
+                                if self.board[i][pivot] == val {
+                                    self.board[i][pivot] = 2 * val;
                                     self.score += 2 * val as u32;
-                                    self.board[i][l - 1] = 0;
+                                    self.board[i][pivot - 1] = 0;
                                 }
                             }
                         }
-                        if l == self.size - 1 {
+                        if pivot == self.size - 1 {
                             break;
                         }
                     }
@@ -109,23 +123,23 @@ impl Game {
         for i in 0..self.size {
             for j in 0..self.size {
                 if !self.is_cell_empty(i, j) {
-                    let mut l = j;
+                    let mut pivot = j;
                     let val = self.board[i][j];
                     loop {
-                        if l > 0 {
-                            l -= 1;
-                            if self.is_cell_empty(i, l) {
-                                self.board[i][l] = val;
-                                self.board[i][l + 1] = 0;
+                        if pivot > 0 {
+                            pivot -= 1;
+                            if self.is_cell_empty(i, pivot) {
+                                self.board[i][pivot] = val;
+                                self.board[i][pivot + 1] = 0;
                             } else {
-                                if self.board[i][l] == val {
-                                    self.board[i][l] = 2 * val;
+                                if self.board[i][pivot] == val {
+                                    self.board[i][pivot] = 2 * val;
                                     self.score += 2 * val as u32;
-                                    self.board[i][l + 1] = 0;
+                                    self.board[i][pivot + 1] = 0;
                                 }
                             }
                         }
-                        if l == 0 {
+                        if pivot == 0 {
                             break;
                         }
                     }
@@ -138,23 +152,23 @@ impl Game {
         for j in 0..self.size {
             for i in (0..self.size).rev() {
                 if !self.is_cell_empty(i, j) {
-                    let mut l = i;
+                    let mut pivot = i;
                     let val = self.board[i][j];
                     loop {
-                        if l < self.size - 1 {
-                            l += 1;
-                            if self.is_cell_empty(l, j) {
-                                self.board[l][j] = val;
-                                self.board[l - 1][j] = 0;
+                        if pivot < self.size - 1 {
+                            pivot += 1;
+                            if self.is_cell_empty(pivot, j) {
+                                self.board[pivot][j] = val;
+                                self.board[pivot - 1][j] = 0;
                             } else {
-                                if self.board[l][j] == val {
-                                    self.board[l][j] = 2 * val;
+                                if self.board[pivot][j] == val {
+                                    self.board[pivot][j] = 2 * val;
                                     self.score += 2 * val as u32;
-                                    self.board[l - 1][j] = 0;
+                                    self.board[pivot - 1][j] = 0;
                                 }
                             }
                         }
-                        if l == self.size - 1 {
+                        if pivot == self.size - 1 {
                             break;
                         }
                     }
@@ -167,23 +181,23 @@ impl Game {
         for j in 0..self.size {
             for i in 0..self.size {
                 if !self.is_cell_empty(i, j) {
-                    let mut l = i;
+                    let mut pivot = i;
                     let val = self.board[i][j];
                     loop {
-                        if l > 0 {
-                            l -= 1;
-                            if self.is_cell_empty(l, j) {
-                                self.board[l][j] = val;
-                                self.board[l + 1][j] = 0;
+                        if pivot > 0 {
+                            pivot -= 1;
+                            if self.is_cell_empty(pivot, j) {
+                                self.board[pivot][j] = val;
+                                self.board[pivot + 1][j] = 0;
                             } else {
-                                if self.board[l][j] == val {
-                                    self.board[l][j] = 2 * val;
+                                if self.board[pivot][j] == val {
+                                    self.board[pivot][j] = 2 * val;
                                     self.score += 2 * val as u32;
-                                    self.board[l + 1][j] = 0;
+                                    self.board[pivot + 1][j] = 0;
                                 }
                             }
                         }
-                        if l == 0 {
+                        if pivot == 0 {
                             break;
                         }
                     }
